@@ -48,3 +48,18 @@ then
 else
 	echo [OK]
 fi
+
+###Filtering Tugas and Pengumuman link
+echo -n Filtering Pengumuman link and Tugas Link...
+grep -Eoi '<a class="menu mc"[^>]+>' index.txt | grep -Eo 'href="[^\"]+"' > link.txt
+
+##Check if link.txt is empty or grep is failed
+CHECK="$?"
+if [ -s link.txt ] && [ $CHECK -eq 0 ]
+then
+    echo [OK]
+else
+    echo [FAILED]
+	echo error code $CHECK
+    exit
+fi
