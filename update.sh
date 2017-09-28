@@ -58,11 +58,7 @@ CHECK="$?"
 if [ -s link.txt ] && [ $CHECK -eq 0 ]
 then
     echo [OK]
-    echo -e "/nAda"
-    cat link.txt | grep "pengumuman" | wc -l
-    echo "pengumuman dan"
-    cat link.txt | grep "detail" | wc -l
-    echo "tugas!"
+    echo -e "\n Ada $(cat link.txt | grep "pengumuman" | wc -l) pengumuman dan $(cat link.txt | grep "detail" | wc -l) tugas!"
 else
     echo [FAILED]
 	echo error code $CHECK
