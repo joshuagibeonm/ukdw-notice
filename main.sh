@@ -2,26 +2,28 @@
 #filename: main.sh
 
 function main-menu {
-	NIM=$(\
- 	dialog --inputbox "Masukkan NIM anda" 8 40 \
-  	3>&1 1>&2 2>&3 3>&- \
-	)
+	##Login input
+	CHECK=1
+	##Loop is used so cancelled passwordbox goes back to nim inputbox
+	while [ $CHECK -eq 1 ]
+	do	
+		NIM=$(\
+	 	dialog --inputbox "Masukkan NIM anda" 8 40 \
+  		3>&1 1>&2 2>&3 3>&- \
+		)
 	
-	CHECK=$?
-	if [ $CHECK -eq 1 ]
-	then 
-		exit
-	fi
+		CHECK=$?
+		if [ $CHECK -eq 1 ]
+		then 
+			exit
+		fi
 	
-	PASSWORD=$(\
- 	dialog --passwordbox "Masukkan password" 8 40 \
-  	3>&1 1>&2 2>&3 3>&- \
-	)
-	CHECK=$?
-	if [ $CHECK -eq 1 ]
-	then 
-		exit
-	fi 
+		PASSWORD=$(\
+	 	dialog --passwordbox "Masukkan password" 8 40 \
+	  	3>&1 1>&2 2>&3 3>&- \
+		)
+		CHECK=$?
+	done
 	update
 }
 
