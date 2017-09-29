@@ -1,18 +1,32 @@
 #!/bin/bash
 #filename: main.sh
 
+function main-menu {
+	NIM=$(\
+ 	dialog --inputbox "Masukkan NIM anda" 8 40 \
+  	3>&1 1>&2 2>&3 3>&- \
+	)
+	
+	CHECK=$?
+	if [ $CHECK -eq 1 ]
+	then 
+		exit
+	fi
+	
+	PASSWORD=$(\
+ 	dialog --passwordbox "Masukkan password" 8 40 \
+  	3>&1 1>&2 2>&3 3>&- \
+	)
+	CHECK=$?
+	if [ $CHECK -eq 1 ]
+	then 
+		exit
+	fi 
+	update
+}
+
 function update {
-	###Login Procedure
-
-	##Read NIM and Password
-	echo Welcome to UKDW-notice
-	echo -n NIM: ;read NIM
-	echo -n Password: ;
-
-	stty -echo;       #to hide user's input
-	read PASSWORD
-	stty echo;        #to show user's input
-
+	
 	##Login to UKDW
 	echo -n Login to UKDW as $NIM...
 	curl -s 'http://ukdw.ac.id/id/home/do_login' \
@@ -71,12 +85,12 @@ function update {
 	CHECK="$?"
 	if [ $CHECK -eq 0 ]
 	then		
-		##Go to main menu function
-		main-menu
+		##Go to next function
+		#next
 		echo "done!"
 	else
 		exit
 	fi
 }
 
-update
+main-menu
