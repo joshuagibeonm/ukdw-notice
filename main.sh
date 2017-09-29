@@ -65,7 +65,18 @@ function update {
 	    exit
 	fi
 
-	echo -e "\n Ada $(cat link.txt | grep "pengumuman" | wc -l) pengumuman dan $(cat link.txt |grep "detail" | wc -l) tugas!"
+	dialog --title 'Perhatian!' --yesno "\n Ada $(cat link.txt | grep "pengumuman" | wc -l) pengumuman dan $(cat link.txt | grep "detail" | wc -l) tugas! \n\nIngin Melihat Detail?" 10 50
+
+	##Check whether user wants to go into main menu	
+	CHECK="$?"
+	if [ $CHECK -eq 0 ]
+	then		
+		##Go to main menu function
+		main-menu
+		echo "done!"
+	else
+		exit
+	fi
 }
 
 update
