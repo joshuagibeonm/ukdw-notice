@@ -95,4 +95,27 @@ function update {
 	fi
 }
 
+function pengumuman-parser{
+	grep -Eo '(http|https)://ukdw.ac.id/e-class/pengumuman/baca/[^"]+' link.txt > link_pengumuman.txt
+
+	COUNT=`wc -l < link_pengumuman.txt`
+	INDEX=1
+
+	while [ $INDEX -le $COUNT ]
+	do
+    		LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:]`
+    
+    		curl "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
+    		-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
+    		-H 'Connection: keep-alive' \
+    		-b cookies.txt \
+    		--compressed -o pengumuman${LINK}.txt
+    		PIDPENGUMUMANTEMP=$!
+    		wait $PIDPENGUMUMANTEMP
+
+    		((INDEX++))
+	done
+}
+
 main-menu
+
