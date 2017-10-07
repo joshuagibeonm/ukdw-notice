@@ -116,7 +116,7 @@ function pengumuman-parser {
 
     		((INDEX++))
 		
-		FILE=$(cat pengumuman${LINK}.txt)
+		FILE="pengumuman${LINK}.txt"
 		
 		#parsing judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
