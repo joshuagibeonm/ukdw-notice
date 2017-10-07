@@ -95,7 +95,7 @@ function update {
 	fi
 }
 
-function pengumuman-parser{
+function pengumuman-parser {
 	grep -Eo '(http|https)://ukdw.ac.id/e-class/pengumuman/baca/[^"]+' link.txt > link_pengumuman.txt
 
 	COUNT=`wc -l < link_pengumuman.txt`
@@ -116,7 +116,7 @@ function pengumuman-parser{
 
     		((INDEX++))
 		
-		FILE=${pengumuman${LINK}.txt}
+		FILE=$(cat pengumuman${LINK}.txt)
 		
 		#parsing judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
