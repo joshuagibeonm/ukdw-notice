@@ -100,6 +100,7 @@ function pengumuman-parser{
 
 	COUNT=`wc -l < link_pengumuman.txt`
 	INDEX=1
+	
 
 	while [ $INDEX -le $COUNT ]
 	do
@@ -114,7 +115,44 @@ function pengumuman-parser{
     		wait $PIDPENGUMUMANTEMP
 
     		((INDEX++))
+		
+		FILE=${pengumuman${LINK}.txt}
+		
+		#parsing judul
+		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
+		printf "Judul   : $JUDUL \n" >> p${LINK}.txt
+
+		#parsing tanggal
+		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
+		printf "Tanggal : $TGL \n" >> p${LINK}.txt
+
+		#parsing matkul and grup
+		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f1-5)
+		GRUP=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | awk '{for(i=1;i<=NF;i++){if($i=="GRUP")for(j=i;j<=NF;j++)printf"%s ",$j};printf"\n"}' )
+		printf "Matkul  : $MATKUL$GRUP \n" >> p${LINK}.txt
+
+		#parsing dosen
+		DOSEN=$(sed '132!d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
+		printf "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
+		
+		#PARSING ISI PENGUMUMAN ($LF= last field)
+		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
+		i=2
+		while [ 1 ]
+		do
+			ISI=$(ex +130p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
+			if [ "$ISI" = "$LF" ]; then
+				echo $ISI | cut -d'<' -f1 >> p${LINK}.txt 
+				break
+			fi
+			echo $ISI >> p${LINK}.txt
+			i=$(( i + 1 ))
+		done
+			
+		
 	done
+
+	
 }
 
 main-menu
