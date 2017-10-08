@@ -133,6 +133,13 @@ function pengumuman-parser {
 		while [ 1 ]
 		do
 			ISI=$(ex +130p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
+			#CEK JIKA ADA HYPERLINK
+   			if [[ $ISI == *"<a href="* ]]; then
+        			ISI=$(echo $ISI | cut -d'<' -f1)
+    			elif [[ $ISI == *"</a"* ]]; then
+        			ISI=$(echo $ISI | cut -d'<' -f1)
+    			fi
+			
 			if [ "$ISI" = "$LF" ]; then
 				echo $ISI | cut -d'<' -f1 >> p${LINK}.txt
 				break
