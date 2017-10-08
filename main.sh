@@ -27,14 +27,14 @@ function login-page {
 	update
 }
 
-function show_tugas {
+function show-tugas {
 	##Display all "Tugas"
 	dialog --title "Menu Pengumuman" \
 	--menu "" 10 30 4\
 	1 placeholder
 }
 
-function show_pengumuman {
+function show-pengumuman {
 	##Display all "Pengumuman"
 	dialog --title "Menu Pengumuman" \
 	--menu "" 10 30 4\
