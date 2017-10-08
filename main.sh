@@ -129,7 +129,7 @@ function pengumuman-parser {
 
 		#PARSING ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
-		i=2
+		i=1
 		while [ 1 ]
 		do
 			ISI=$(ex +130p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
