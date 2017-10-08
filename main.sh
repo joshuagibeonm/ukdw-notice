@@ -6,18 +6,18 @@ function main-menu {
 	CHECK=1
 	##Loop is used so cancelled passwordbox goes back to nim inputbox
 	while [ $CHECK -eq 1 ]
-	do	
+	do
 		NIM=$(\
 	 	dialog --inputbox "Masukkan NIM anda" 8 40 \
   		3>&1 1>&2 2>&3 3>&- \
 		)
-	
+
 		CHECK=$?
 		if [ $CHECK -eq 1 ]
-		then 
+		then
 			exit
 		fi
-	
+
 		PASSWORD=$(\
 	 	dialog --passwordbox "Masukkan password" 8 40 \
 	  	3>&1 1>&2 2>&3 3>&- \
@@ -28,7 +28,7 @@ function main-menu {
 }
 
 function update {
-	
+
 	##Login to UKDW
 	echo -n Login to UKDW as $NIM...
 	curl -s 'http://ukdw.ac.id/id/home/do_login' \
@@ -81,9 +81,7 @@ function update {
 	    exit
 	fi
 
-	dialog --title 'Perhatian!' --yesno "\n Ada $(cat link.txt | grep "pengumuman" | wc -l) pengumuman dan $(cat link.txt | grep "detail" | wc -l) tugas! \n\nIngin Melihat Detail?" 10 50
-
-	##Check whether user wants to go into main menu	
+	##Check whether user wants to go into main menu
 	CHECK="$?"
 	if [ $CHECK -eq 0 ]
 	then
@@ -98,24 +96,20 @@ function pengumuman-parser {
 
 	COUNT=`wc -l < link_pengumuman.txt`
 	INDEX=1
-	
+
 
 	while [ $INDEX -le $COUNT ]
 	do
-    		LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:]`
-    
-    		curl "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
-    		-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
-    		-H 'Connection: keep-alive' \
-    		-b cookies.txt \
-    		--compressed -o pengumuman${LINK}.txt
-    		PIDPENGUMUMANTEMP=$!
-    		wait $PIDPENGUMUMANTEMP
+    	LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:]`
 
-    		((INDEX++))
-		
+    	curl -s "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
+    	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
+    	-H 'Connection: keep-alive' \
+    	-b cookies.txt \
+    	--compressed -o pengumuman${LINK}.txt
+
 		FILE="pengumuman${LINK}.txt"
-		
+
 		#parsing judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
 		printf "Judul   : $JUDUL \n" >> p${LINK}.txt
@@ -132,7 +126,7 @@ function pengumuman-parser {
 		#parsing dosen
 		DOSEN=$(sed '132!d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
 		printf "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
-		
+
 		#PARSING ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
 		i=2
@@ -140,18 +134,15 @@ function pengumuman-parser {
 		do
 			ISI=$(ex +130p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
 			if [ "$ISI" = "$LF" ]; then
-				echo $ISI | cut -d'<' -f1 >> p${LINK}.txt 
+				echo $ISI | cut -d'<' -f1 >> p${LINK}.txt
 				break
 			fi
 			echo $ISI >> p${LINK}.txt
 			i=$(( i + 1 ))
 		done
-			
-		
+		rm pengumuman${LINK}.txt
+		((INDEX++))
 	done
-
-	
 }
 
 main-menu
-
