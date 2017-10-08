@@ -115,13 +115,11 @@ function update {
 	    exit
 	fi
 
-	dialog --title 'Perhatian!' --yesno "\n Ada $(cat link.txt | grep "pengumuman" | wc -l) pengumuman dan $(cat link.txt | grep "detail" | wc -l) tugas! \n\nIngin Melihat Detail?" 10 50
-
 	##Check whether user wants to go into main menu
 	CHECK="$?"
 	if [ $CHECK -eq 0 ]
 	then
-		#pengumuman-parser
+		pengumuman-parser
 
 		main-menu
 	else
@@ -138,43 +136,47 @@ function pengumuman-parser {
 
 	while [ $INDEX -le $COUNT ]
 	do
-    		LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:]`
+    	LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:] | tee -a pangka.txt`
+		echo >> pangka.txt
 
-    		curl "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
-    		-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
-    		-H 'Connection: keep-alive' \
-    		-b cookies.txt \
-    		--compressed -o pengumuman${LINK}.txt
-    		PIDPENGUMUMANTEMP=$!
-    		wait $PIDPENGUMUMANTEMP
-
-    		((INDEX++))
+    	curl -s "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
+    	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
+    	-H 'Connection: keep-alive' \
+    	-b cookies.txt \
+    	--compressed -o pengumuman${LINK}.txt
 
 		FILE="pengumuman${LINK}.txt"
 
 		#parsing judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
-		printf "Judul   : $JUDUL \n" >> p${LINK}.txt
+		printf "Judul:$JUDUL \n" >> p${LINK}.txt
 
 		#parsing tanggal
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
-		printf "Tanggal : $TGL \n" >> p${LINK}.txt
+		printf "Tanggal:$TGL \n" >> p${LINK}.txt
 
 		#parsing matkul and grup
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f1-5)
 		GRUP=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | awk '{for(i=1;i<=NF;i++){if($i=="GRUP")for(j=i;j<=NF;j++)printf"%s ",$j};printf"\n"}' )
-		printf "Matkul  : $MATKUL$GRUP \n" >> p${LINK}.txt
+		printf "Matkul:$MATKUL$GRUP \n" >> p${LINK}.txt
 
 		#parsing dosen
 		DOSEN=$(sed '132!d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
-		printf "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
+		printf "Dosen:$DOSEN \n\n" >> p${LINK}.txt
 
 		#PARSING ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
-		i=2
+		i=1
 		while [ 1 ]
 		do
 			ISI=$(ex +130p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
+			#CEK JIKA ADA HYPERLINK
+   			if [[ $ISI == *"<a href="* ]]; then
+        			ISI=$(echo $ISI | cut -d'<' -f1)
+    			elif [[ $ISI == *"</a"* ]]; then
+        			ISI=$(echo $ISI | cut -d'<' -f1)
+    			fi
+
 			if [ "$ISI" = "$LF" ]; then
 				echo $ISI | cut -d'<' -f1 >> p${LINK}.txt
 				break
@@ -182,11 +184,18 @@ function pengumuman-parser {
 			echo $ISI >> p${LINK}.txt
 			i=$(( i + 1 ))
 		done
-
-
+		rm pengumuman${LINK}.txt
+		((INDEX++))
 	done
-
-
 }
 
 login-page
+#
+#CODE=`sed '4!d' pangka.txt`
+#JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
+#TANGGAL=`sed '2!d' p$CODE.txt | cut -d':' -f2`
+#MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
+#DOSEN=`sed '4!d' p$CODE.txt | cut -d':' -f2`
+#LINES=`wc -l < p$CODE.txt`
+#ISI=`sed -n "5,${LINES}p" p$CODE.txt`
+#
