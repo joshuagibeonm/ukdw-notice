@@ -100,7 +100,8 @@ function pengumuman-parser {
 
 	while [ $INDEX -le $COUNT ]
 	do
-    	LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:]`
+    	LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:] | tee -a pangka.txt`
+		echo >> pangka.txt
 
     	curl -s "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
     	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
@@ -112,20 +113,20 @@ function pengumuman-parser {
 
 		#parsing judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
-		printf "Judul   : $JUDUL \n" >> p${LINK}.txt
+		printf "Judul:$JUDUL \n" >> p${LINK}.txt
 
 		#parsing tanggal
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
-		printf "Tanggal : $TGL \n" >> p${LINK}.txt
+		printf "Tanggal:$TGL \n" >> p${LINK}.txt
 
 		#parsing matkul and grup
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f1-5)
 		GRUP=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | awk '{for(i=1;i<=NF;i++){if($i=="GRUP")for(j=i;j<=NF;j++)printf"%s ",$j};printf"\n"}' )
-		printf "Matkul  : $MATKUL$GRUP \n" >> p${LINK}.txt
+		printf "Matkul:$MATKUL$GRUP \n" >> p${LINK}.txt
 
 		#parsing dosen
 		DOSEN=$(sed '132!d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
-		printf "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
+		printf "Dosen:$DOSEN \n\n" >> p${LINK}.txt
 
 		#PARSING ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
@@ -146,3 +147,13 @@ function pengumuman-parser {
 }
 
 main-menu
+
+#
+#CODE=`sed '4!d' pangka.txt`
+#JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
+#TANGGAL=`sed '2!d' p$CODE.txt | cut -d':' -f2`
+#MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
+#DOSEN=`sed '4!d' p$CODE.txt | cut -d':' -f2`
+#LINES=`wc -l < p$CODE.txt`
+#ISI=`sed -n "5,${LINES}p" p$CODE.txt`
+#
