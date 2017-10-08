@@ -36,6 +36,13 @@ function show-tugas {
 
 function show-pengumuman {
 	##Display all "Pengumuman"
+	LIMIT=`wc -l < pangka.txt`
+	for i in $LIMIT; do
+		CODE=`sed "${i}!d" pangka.txt`
+		JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
+		MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
+		ASU="$ASU $i $JUDUL:$MATKUL"
+	done
 	dialog --title "Menu Pengumuman" \
 	--menu "" 10 30 4\
 	1 placeholder
