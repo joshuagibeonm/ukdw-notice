@@ -86,10 +86,8 @@ function update {
 	##Check whether user wants to go into main menu	
 	CHECK="$?"
 	if [ $CHECK -eq 0 ]
-	then		
-		##Go to next function
-		#next
-		echo "done!"
+	then
+		pengumuman-parser
 	else
 		exit
 	fi
