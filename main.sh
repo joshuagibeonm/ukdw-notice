@@ -37,15 +37,19 @@ function show-tugas {
 function show-pengumuman {
 	##Display all "Pengumuman"
 	LIMIT=`wc -l < pangka.txt`
-	for i in $LIMIT; do
-		CODE=`sed "${i}!d" pangka.txt`
+	INDEX=1
+	while [ $INDEX -le $LIMIT ]
+	do
+		CODE=`sed "${INDEX}!d" pangka.txt`
 		JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
 		MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
-		ASU="$ASU $i $JUDUL:$MATKUL"
+		ASU="$ASU $INDEX "
+		((INDEX++))
 	done
+	echo $ASU
 	dialog --title "Menu Pengumuman" \
-	--menu "" 10 30 4\
-	1 placeholder
+	--menu "" 20 70 4\
+	$ASU
 }
 
 function main-menu {
@@ -59,8 +63,8 @@ function main-menu {
 		Exit "Keluar dari menu ini" 3>&1 1>&2 2>&3 3>&-)
 
 		case $pilihan in
-			Pengumuman ) show_pengumuman;;
-			Tugas ) show_tugas;;
+			Pengumuman ) show-pengumuman;;
+			Tugas ) show-tugas;;
 			Exit) break;;
 		esac
 
@@ -197,6 +201,13 @@ function pengumuman-parser {
 }
 
 login-page
+
+rm p*.txt
+rm index.txt
+rm link.txt
+rm cookies.txt
+rm link_pengumuman.txt
+#login-page
 #
 #CODE=`sed '4!d' pangka.txt`
 #JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
