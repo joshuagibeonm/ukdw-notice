@@ -202,9 +202,9 @@ function pengumuman-parser {
 	done
 }
 
-#login-page
-main-menu
-#rm p*.txt
+login-page
+
+rm p*.txt
 rm index.txt
 rm link.txt
 rm cookies.txt
