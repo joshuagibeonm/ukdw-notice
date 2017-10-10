@@ -38,18 +38,20 @@ function show-pengumuman {
 	##Display all "Pengumuman"
 	LIMIT=`wc -l < pangka.txt`
 	INDEX=1
+	ASU=()
+
 	while [ $INDEX -le $LIMIT ]
 	do
 		CODE=`sed "${INDEX}!d" pangka.txt`
 		JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
 		MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
-		ASU="$ASU $INDEX "
+		ASU+=($INDEX "$MATKUL")
 		((INDEX++))
 	done
-	echo $ASU
+
 	dialog --title "Menu Pengumuman" \
-	--menu "" 20 70 4\
-	$ASU
+	--menu "" 20 70 4 \
+	"${ASU[@]}"
 }
 
 function main-menu {
@@ -200,9 +202,9 @@ function pengumuman-parser {
 	done
 }
 
-login-page
-
-rm p*.txt
+#login-page
+main-menu
+#rm p*.txt
 rm index.txt
 rm link.txt
 rm cookies.txt
