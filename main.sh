@@ -169,7 +169,7 @@ function pengumuman-parser {
 		printf "Tanggal:$TGL \n" >> p${LINK}.txt
 
 		#parsing matkul and grup
-		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f1-5)
+		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5)
 		GRUP=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | awk '{for(i=1;i<=NF;i++){if($i=="GRUP")for(j=i;j<=NF;j++)printf"%s ",$j};printf"\n"}' )
 		printf "Matkul:$MATKUL$GRUP \n" >> p${LINK}.txt
 
