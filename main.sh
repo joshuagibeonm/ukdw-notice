@@ -45,12 +45,12 @@ function show-pengumuman {
 		CODE=`sed "${INDEX}!d" pangka.txt`
 		JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
 		MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
-		ASU+=($INDEX "$MATKUL")
+		ASU+=("$MATKUL" "$JUDUL")
 		((INDEX++))
 	done
 
 	dialog --title "Menu Pengumuman" \
-	--menu "" 20 70 4 \
+	--menu "" 30 100 20 \
 	"${ASU[@]}"
 }
 
