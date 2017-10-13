@@ -65,9 +65,9 @@ function show-pengumuman {
 
 	while [ $INDEX -le $LIMIT ]
 	do
-		CODE=`sed "${INDEX}!d" pangka.txt`
-		JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
-		MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
+		CODE=`sed "${INDEX}q;d" pangka.txt`
+		JUDUL=`sed '1q;d' p$CODE.txt | cut -d':' -f2`
+		MATKUL=`sed '3q;d' p$CODE.txt | cut -d':' -f2`
 		ASU+=("$CODE" "$MATKUL: $JUDUL")
 		((INDEX++))
 	done
@@ -196,7 +196,7 @@ function pengumuman-parser {
 		printf "Matkul:$MATKUL\n" >> p${LINK}.txt
 
 		#parsing dosen
-		DOSEN=$(sed '132!d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
+		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
 		printf "Dosen:$DOSEN \n\n" >> p${LINK}.txt
 
 		#PARSING ISI PENGUMUMAN ($LF= last field)
