@@ -1,4 +1,4 @@
-16#!/bin/bash
+#!/bin/bash
 #filename: main.sh
 
 function login-page {
@@ -24,17 +24,30 @@ function login-page {
 		)
 		CHECK=$?
 	done
+
+	##Login to UKDW
+	echo -n Login to UKDW as $NIM...
+	curl -s 'http://ukdw.ac.id/id/home/do_login' \
+	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
+	--data "return_url=http%3A%2F%2Fukdw.ac.id%2Fe-class%2Fid%2Fkelas%2Findex&id=${NIM}&password=${PASSWORD}" \
+	--compressed -c cookies.txt
+	##Check if lCHECK="$?"ogin is failed
+	CHECK="$?"
+	if [ $CHECK -ne 0 ]
+	then
+		echo Failed with error code $CHECK
+		exit
+	else
+		echo [OK]
+	fi
+
+
 	update
 }
 
 function  pengumuman {
 	MESSAGE=`cat p$1.txt`
 	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
-}
-
-function tugas {
-
-
 }
 
 function show-tugas {
@@ -99,23 +112,6 @@ function main-menu {
 
 function update {
 
-	##Login to UKDW
-	echo -n Login to UKDW as $NIM...
-	curl -s 'http://ukdw.ac.id/id/home/do_login' \
-	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
-	--data "return_url=http%3A%2F%2Fukdw.ac.id%2Fe-class%2Fid%2Fkelas%2Findex&id=${NIM}&password=${PASSWORD}" \
-	--compressed -c cookies.txt
-
-	##Check if lCHECK="$?"ogin is failed
-	CHECK="$?"
-	if [ $CHECK -ne 0 ]
-	then
-		echo Failed with error code $CHECK
-		exit
-	else
-		echo [OK]
-	fi
-
 	###Grab Procedure
 
 	##Grab http://ukdw.ac.id/e-class/id/kelas/index
@@ -155,8 +151,12 @@ function update {
 	CHECK="$?"
 	if [ $CHECK -eq 0 ]
 	then
-		pengumuman-parser
-		tugas-parser
+		pengumuman-parser &
+		PIDPENG=$!
+		tugas-parser &
+		PIDTUGAS=$!
+		wait $PIDPENG
+		wait $PIDTUGAS
 		main-menu
 	else
 		exit
@@ -249,12 +249,12 @@ function tugas-parser {
 login-page
 
 rm p*.txt
-#rm t*.txt
+rm t*.txt
 rm index.txt
 rm link.txt
 rm cookies.txt
 rm link_pengumuman.txt
-#rm link_tugas.txt
+rm link_tugas.txt
 #login-page
 #
 #CODE=`sed '4!d' pangka.txt`
