@@ -1,4 +1,4 @@
-#!/bin/bash
+16#!/bin/bash
 #filename: main.sh
 
 function login-page {
@@ -52,6 +52,8 @@ function show-pengumuman {
 	dialog --title "Menu Pengumuman" \
 	--menu "" 30 100 20 \
 	"${ASU[@]}"
+
+
 }
 
 function main-menu {
@@ -133,7 +135,7 @@ function update {
 	if [ $CHECK -eq 0 ]
 	then
 		pengumuman-parser
-
+		tugas-parser
 		main-menu
 	else
 		exit
@@ -201,13 +203,37 @@ function pengumuman-parser {
 	done
 }
 
+function tugas-parser {
+	grep -Eo '(http|https)://ukdw.ac.id/e-class/kelas/detail_tugas/[^"]+' link.txt > link_tugas.txt
+
+	COUNT=`wc -l < link_tugas.txt`
+	INDEX=1
+
+
+	while [ $INDEX -le $COUNT ]
+	do
+    	LINK=`sed -n "${INDEX}p" link_tugas.txt | grep -Eo 'detail_tugas/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:] | tee -a tangka.txt`
+		echo >> tangka.txt
+
+    	curl -s "http://ukdw.ac.id/e-class/id/kelas/detail_tugas/${LINK}" \
+    	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
+    	-H 'Connection: keep-alive' \
+    	-b cookies.txt \
+    	--compressed -o tugas${LINK}.txt
+
+		((INDEX++))
+	done
+}
+
 login-page
 
 rm p*.txt
+#rm t*.txt
 rm index.txt
 rm link.txt
 rm cookies.txt
 rm link_pengumuman.txt
+#rm link_tugas.txt
 #login-page
 #
 #CODE=`sed '4!d' pangka.txt`
