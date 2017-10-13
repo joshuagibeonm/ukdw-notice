@@ -19,12 +19,22 @@ function login-page {
 		fi
 
 		PASSWORD=$(\
-	 	dialog --passwordbox "Masukkan password" 8 40 \
+	 	dialog --title "User NIM: $NIM" --insecure --passwordbox "Masukkan password" 8 40 \
 	  	3>&1 1>&2 2>&3 3>&- \
 		)
 		CHECK=$?
 	done
 	update
+}
+
+function  pengumuman {
+	MESSAGE=`cat p$1.txt`
+	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
+}
+
+function tugas {
+	
+
 }
 
 function show-tugas {
@@ -49,27 +59,40 @@ function show-pengumuman {
 		((INDEX++))
 	done
 
-	dialog --title "Menu Pengumuman" \
-	--menu "" 30 100 20 \
-	"${ASU[@]}"
+	while [ true ]
+	do
+		RESPON=$(dialog --cancel-label "Back" --title "Menu Pengumuman" \
+		--menu "" 20 80 100 \
+		"${ASU[@]}" \
+		3>&1 1>&2 2>&3 3>&- \
+		)
+
+		CHECK=$?
+		if [ $CHECK -eq 0 ]
+		then
+			pengumuman $RESPON
+		else
+			break
+		fi
+	done
 }
 
 function main-menu {
 	##Display a menu dialog box which consists of all available "pengumuman" and "tugas" in an infinite loop until exit
 	while true
 	do
-		pilihan=$(dialog --title "Menu Utama" \
-		--menu "" 10 50 4 \
+		pilihan=$(dialog --title "Menu Utama" --no-cancel --no-ok \
+		--menu "" 9 50 3 \
 		Pengumuman "Menampilkan semua pengumuman" \
 		Tugas "Menampilkan semua tugas" \
-		Exit "Keluar dari menu ini" 3>&1 1>&2 2>&3 3>&-)
+		EXIT "Keluar dari program ini" \
+		3>&1 1>&2 2>&3 3>&-)
 
 		case $pilihan in
 			Pengumuman ) show-pengumuman;;
 			Tugas ) show-tugas;;
-			Exit) break;;
+			EXIT ) break;;
 		esac
-
 	done
 
 }
@@ -83,7 +106,7 @@ function update {
 	--data "return_url=http%3A%2F%2Fukdw.ac.id%2Fe-class%2Fid%2Fkelas%2Findex&id=${NIM}&password=${PASSWORD}" \
 	--compressed -c cookies.txt
 
-	##Check if login is failed
+	##Check if lCHECK="$?"ogin is failed
 	CHECK="$?"
 	if [ $CHECK -ne 0 ]
 	then
