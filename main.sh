@@ -47,57 +47,25 @@ function  pengumuman {
 	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
 }
 
-function tugas {
-	MESSAGE=`cat t$1.txt`
-	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
-}
-
 function show-tugas {
 	##Display all "Tugas"
-	LIMIT=`wc -l < tangka.txt`
-	INDEX=1
-	LIST=()
-
-	while [ $INDEX -le $LIMIT ]
-	do
-		CODE=`sed "${INDEX}q;d" tangka.txt`
-		JUDUL=`sed '1q;d' t$CODE.txt | cut -d':' -f2`
-		MATKUL=`sed '3q;d' t$CODE.txt | cut -d':' -f2`
-		LIST+=("$CODE" "$MATKUL: $JUDUL")
-		((INDEX++))
-	done
-
-	while true
-	do
-		RESPON=$(dialog --cancel-label "Back" --title "Menu Tugas" \
-		--menu "" 20 80 100 \
-		"${LIST[@]}" \
-		3>&1 1>&2 2>&3 3>&- \
-		)
-
-		CHECK=$?
-		if [ $CHECK -eq 0 ]
-		then
-			pengumuman $RESPON
-		else
-			break
-		fi
-	done
-
+	dialog --title "Menu Pengumuman" \
+	--menu "" 10 30 4\
+	1 placeholder
 }
 
 function show-pengumuman {
 	##Display all "Pengumuman"
 	LIMIT=`wc -l < pangka.txt`
 	INDEX=1
-	LIST=()
+	ASU=()
 
 	while [ $INDEX -le $LIMIT ]
 	do
 		CODE=`sed "${INDEX}q;d" pangka.txt`
 		JUDUL=`sed '1q;d' p$CODE.txt | cut -d':' -f2`
 		MATKUL=`sed '3q;d' p$CODE.txt | cut -d':' -f2`
-		LIST+=("$CODE" "$MATKUL: $JUDUL")
+		ASU+=("$CODE" "$MATKUL: $JUDUL")
 		((INDEX++))
 	done
 
@@ -105,7 +73,7 @@ function show-pengumuman {
 	do
 		RESPON=$(dialog --cancel-label "Back" --title "Menu Pengumuman" \
 		--menu "" 20 80 100 \
-		"${LIST[@]}" \
+		"${ASU[@]}" \
 		3>&1 1>&2 2>&3 3>&- \
 		)
 
@@ -209,19 +177,19 @@ function pengumuman-parser {
 
 		#parsing judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
-		printf "Judul:$JUDUL \n" >> p${LINK}.txt
+		printf "Judul  : $JUDUL \n" >> p${LINK}.txt
 
 		#parsing tanggal
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
-		printf "Tanggal:$TGL \n" >> p${LINK}.txt
+		printf "Tanggal: $TGL \n" >> p${LINK}.txt
 
 		#parsing matkul
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5)
-		printf "Matkul:$MATKUL\n" >> p${LINK}.txt
+		printf "Matkul : $MATKUL\n" >> p${LINK}.txt
 
 		#parsing dosen
 		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
-		printf "Dosen:$DOSEN \n\n" >> p${LINK}.txt
+		printf "Dosen  : $DOSEN \n\n" >> p${LINK}.txt
 
 		#PARSING ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
@@ -243,6 +211,7 @@ function pengumuman-parser {
 			echo $ISI >> p${LINK}.txt
 			i=$(( i + 1 ))
 		done
+		sed -i -e 's/&amp;/\&/g; s/&lt;/\</g; s/&gt;/\>/g; s/&quot;/\"/g; s/#&#39;/\'"'"'/g; s/&ldquo;/\"/g; s/&rdquo;/\"/g;' p${LINK}.txt
 		rm pengumuman${LINK}.txt
 		((INDEX++))
 	done
@@ -266,25 +235,23 @@ function tugas-parser {
     	-b cookies.txt \
     	--compressed -o tugas${LINK}.txt
 		FILE="tugas${LINK}.txt"
-
-		#parse judul
-		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
-		echo -e "$JUDUL" > tamp2.txt
-		echo -e "Judul  : `sed '2q;d' tamp2.txt`" >> t${LINK}.txt
-
+		
 		#parse tanggal
-		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1)
-		echo -e "$TGL" > tamp.txt
-		echo -e "Tanggal: `sed '2q;d' tamp.txt`" >> t${LINK}.txt
-
+		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n')
+		echo -e "Tanggal: $TGL" >> t${LINK}.txt
+		
 		#parse matkul
-		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1 | sed -e 's/[[:space:]]*$//')
+		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1)
 		echo -e "Matkul :$MATKUL" >> t${LINK}.txt
-
+		
 		#parse group
 		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1)
-		echo -e "Group  : $GROUP \n" >> t${LINK}.txt
-
+		echo -e "Group  : $GROUP" >> t${LINK}.txt
+		
+		#parse judul
+		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | tr -d '\n')
+		echo -e "Judul  : $JUDUL \n" >> t${LINK}.txt
+		
 		#parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
 		i=2
@@ -298,9 +265,9 @@ function tugas-parser {
 		    echo $ISI >> t${LINK}.txt
 		    i=$(( i + 1 ))
 		done
-
+		
 		echo -e " \n " >> t${LINK}.txt
-
+		
 		#parse ketentuan tugas
 		K1=$(ex +232p -scq $FILE | cut -d'<' -f1)
 		K2=$(ex +233p -scq $FILE | cut -d'<' -f1)
@@ -309,12 +276,13 @@ function tugas-parser {
 		K=$(grep -n 'Tugas dikumpulkan' $FILE | cut -d':' -f1)
 		K=$(( K + 1 ))
 		K5=$(sed "${K}q;d" $FILE | awk '{gsub("<span class=\"note\">", "");print}' | awk '{gsub("</span><br/>", "");print}' )
-
+		
 		echo $K1 >> t${LINK}.txt
 		echo $K2 $K3 >> t${LINK}.txt
 		echo $K4 >> t${LINK}.txt
 		echo $K5 >> t${LINK}.txt
-
+		
+		sed -i -e 's/&amp;/\&/g; s/&lt;/\</g; s/&gt;/\>/g; s/&quot;/\"/g; s/#&#39;/\'"'"'/g; s/&ldquo;/\"/g; s/&rdquo;/\"/g;' t${LINK}.txt
 		rm tugas${LINK}.txt
 		((INDEX++))
 	done
