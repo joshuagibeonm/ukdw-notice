@@ -267,23 +267,23 @@ function tugas-parser {
     	--compressed -o tugas${LINK}.txt
 		FILE="tugas${LINK}.txt"
 
+		#parse judul
+		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
+		echo -e "$JUDUL" > tamp2.txt
+		echo -e "Judul  : `sed '2q;d' tamp2.txt`" >> t${LINK}.txt
+
 		#parse tanggal
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1)
 		echo -e "$TGL" > tamp.txt
 		echo -e "Tanggal: `sed '2q;d' tamp.txt`" >> t${LINK}.txt
 
 		#parse matkul
-		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1)
+		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1 | sed -e 's/[[:space:]]*$//')
 		echo -e "Matkul :$MATKUL" >> t${LINK}.txt
 
 		#parse group
 		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1)
-		echo -e "Group  : $GROUP" >> t${LINK}.txt
-
-		#parse judul
-		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
-		echo -e "$JUDUL" > tamp2.txt
-		echo -e "Judul  : `sed '2q;d' tamp2.txt` \n" >> t${LINK}.txt
+		echo -e "Group  : $GROUP \n" >> t${LINK}.txt
 
 		#parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
