@@ -56,14 +56,14 @@ function show-tugas {
 	##Display all "Tugas"
 	LIMIT=`wc -l < tangka.txt`
 	INDEX=1
-	ASU=()
+	LIST=()
 
 	while [ $INDEX -le $LIMIT ]
 	do
 		CODE=`sed "${INDEX}q;d" tangka.txt`
 		JUDUL=`sed '1q;d' t$CODE.txt | cut -d':' -f2`
 		MATKUL=`sed '3q;d' t$CODE.txt | cut -d':' -f2`
-		ASU+=("$CODE" "$MATKUL: $JUDUL")
+		LIST+=("$CODE" "$MATKUL: $JUDUL")
 		((INDEX++))
 	done
 
@@ -71,7 +71,7 @@ function show-tugas {
 	do
 		RESPON=$(dialog --cancel-label "Back" --title "Menu Tugas" \
 		--menu "" 20 80 100 \
-		"${ASU[@]}" \
+		"${LIST[@]}" \
 		3>&1 1>&2 2>&3 3>&- \
 		)
 
@@ -90,14 +90,14 @@ function show-pengumuman {
 	##Display all "Pengumuman"
 	LIMIT=`wc -l < pangka.txt`
 	INDEX=1
-	ASU=()
+	LIST=()
 
 	while [ $INDEX -le $LIMIT ]
 	do
 		CODE=`sed "${INDEX}q;d" pangka.txt`
 		JUDUL=`sed '1q;d' p$CODE.txt | cut -d':' -f2`
 		MATKUL=`sed '3q;d' p$CODE.txt | cut -d':' -f2`
-		ASU+=("$CODE" "$MATKUL: $JUDUL")
+		LIST+=("$CODE" "$MATKUL: $JUDUL")
 		((INDEX++))
 	done
 
@@ -105,7 +105,7 @@ function show-pengumuman {
 	do
 		RESPON=$(dialog --cancel-label "Back" --title "Menu Pengumuman" \
 		--menu "" 20 80 100 \
-		"${ASU[@]}" \
+		"${LIST[@]}" \
 		3>&1 1>&2 2>&3 3>&- \
 		)
 
