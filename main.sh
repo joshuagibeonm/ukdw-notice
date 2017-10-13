@@ -229,6 +229,7 @@ function tugas-parser {
 
 	COUNT=`wc -l < link_tugas.txt`
 	INDEX=1
+echo HELLO WORLD
 
 
 	while [ $INDEX -le $COUNT ]
