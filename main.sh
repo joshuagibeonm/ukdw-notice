@@ -233,7 +233,56 @@ function tugas-parser {
     	-H 'Connection: keep-alive' \
     	-b cookies.txt \
     	--compressed -o tugas${LINK}.txt
-
+		FILE="tugas${LINK}.txt"
+		
+		#parse tanggal
+		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1)
+		echo -e "Tanggal:$TGL" >> t${LINK}.txt
+		
+		#parse matkul
+		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1)
+		echo -e "Matkul :$MATKUL" >> t${LINK}.txt
+		
+		#parse group
+		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1)
+		echo -e "Group  : $GROUP" >> t${LINK}.txt
+		
+		#parse judul
+		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
+		echo -e "Judul  :$JUDUL \n" >> t${LINK}.txt
+		
+		
+		#parse isi tugas
+		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
+		i=2
+		while [ 1 ]
+		  do
+		    ISI=$(ex +231p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
+		    if [ "$ISI" = "$LF" ]; then
+		      echo $ISI | cut -d'<' -f1 >> t${LINK}.txt
+		      break
+		    fi
+		    echo $ISI >> t${LINK}.txt
+		    i=$(( i + 1 ))
+		done
+		
+		echo -e " \n " >> t${LINK}.txt
+		
+		#parse ketentuan tugas
+		K1=$(ex +232p -scq $FILE | cut -d'<' -f1)
+		K2=$(ex +233p -scq $FILE | cut -d'<' -f1)
+		K3=$(sed '234q;d' $FILE)
+		K4=$(grep 'Tugas dikumpulkan' $FILE | cut -d'<' -f1,2 | sed 's/<b>//g')
+		K=$(grep -n 'Tugas dikumpulkan' $FILE | cut -d':' -f1)
+		K=$(( K + 1 ))
+		K5=$(sed "${K}q;d" $FILE | awk '{gsub("<span class=\"note\">", "");print}' | awk '{gsub("</span><br/>", "");print}' )
+		
+		echo $K1 >> t${LINK}.txt
+		echo $K2 $K3 >> t${LINK}.txt
+		echo $K4 >> t${LINK}.txt
+		echo $K5 >> t${LINK}.txt
+		
+		rm tugas${LINK}.txt
 		((INDEX++))
 	done
 }
