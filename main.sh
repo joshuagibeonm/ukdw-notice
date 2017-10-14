@@ -62,8 +62,8 @@ function show-tugas {
 	while [ $INDEX -le $LIMIT ]
 	do
 		CODE=`sed "${INDEX}q;d" tangka.txt`
-		JUDUL=`sed '1q;d' t$CODE.txt | cut -d':' -f2`
-		MATKUL=`sed '3q;d' t$CODE.txt | cut -d':' -f2`
+		JUDUL=`sed '4q;d' t$CODE.txt | cut -d':' -f2`
+		MATKUL=`sed '2q;d' t$CODE.txt | cut -d':' -f2`
 		ASU+=("$CODE" "$MATKUL: $JUDUL")
 		((INDEX++))
 	done
