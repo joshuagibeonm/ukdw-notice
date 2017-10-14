@@ -47,11 +47,43 @@ function  pengumuman {
 	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
 }
 
+function tugas {
+	MESSAGE=`cat t$1.txt`
+	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
+
+}
+
 function show-tugas {
 	##Display all "Tugas"
-	dialog --title "Menu Pengumuman" \
-	--menu "" 10 30 4\
-	1 placeholder
+	LIMIT=`wc -l < tangka.txt`
+	INDEX=1
+	ASU=()
+
+	while [ $INDEX -le $LIMIT ]
+	do
+		CODE=`sed "${INDEX}q;d" tangka.txt`
+		JUDUL=`sed '1q;d' t$CODE.txt | cut -d':' -f2`
+		MATKUL=`sed '3q;d' t$CODE.txt | cut -d':' -f2`
+		ASU+=("$CODE" "$MATKUL: $JUDUL")
+		((INDEX++))
+	done
+
+	while true
+	do
+		RESPON=$(dialog --cancel-label "Back" --title "Menu Tugas" \
+		--menu "" 20 80 100 \
+		"${ASU[@]}" \
+		3>&1 1>&2 2>&3 3>&- \
+		)
+
+		CHECK=$?
+		if [ $CHECK -eq 0 ]
+		then
+			tugas $RESPON
+		else
+			break
+		fi
+	done
 }
 
 function show-pengumuman {
