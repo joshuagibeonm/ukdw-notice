@@ -209,7 +209,7 @@ function pengumuman-parser {
 
 		##PARSE JUDUL PENGUMUMAN
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Judul  : $JUDUL \n" >> p${LINK}.txt
+		printf "Judul: $JUDUL \n" >> p${LINK}.txt
 
 		##PARSE TANGGAL PENGUMUMAN
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -217,11 +217,11 @@ function pengumuman-parser {
 
 		##PARSE MATAKULIAH PENGUMUMAN
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Matkul : $MATKUL\n" >> p${LINK}.txt
+		printf "Matkul: $MATKUL\n" >> p${LINK}.txt
 
 		#PARSE NAMA DOSEN
 		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Dosen  : $DOSEN \n\n" >> p${LINK}.txt
+		printf "Dosen: $DOSEN \n\n" >> p${LINK}.txt
 
 		##PARSE ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
@@ -269,20 +269,20 @@ function tugas-parser {
 		FILE="tugas${LINK}.txt"
 		
 		#parse tanggal
-		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n')
+		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 		echo -e "Tanggal: $TGL" >> t${LINK}.txt
 		
 		#parse matkul
-		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1)
-		echo -e "Matkul :$MATKUL" >> t${LINK}.txt
+		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+		echo -e "Matkul:$MATKUL" >> t${LINK}.txt
 		
 		#parse group
-		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1)
-		echo -e "Group  : $GROUP" >> t${LINK}.txt
+		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+		echo -e "Group: $GROUP" >> t${LINK}.txt
 		
 		#parse judul
-		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | tr -d '\n')
-		echo -e "Judul  : $JUDUL \n" >> t${LINK}.txt
+		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+		echo -e "Judul: $JUDUL \n" >> t${LINK}.txt
 		
 		#parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
