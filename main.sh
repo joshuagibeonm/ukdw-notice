@@ -211,19 +211,19 @@ function pengumuman-parser {
 
 		##PARSE JUDUL PENGUMUMAN
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Judul   : $JUDUL \n" >> p${LINK}.txt
+		echo -e "Judul   : $JUDUL" >> p${LINK}.txt
 
 		##PARSE TANGGAL PENGUMUMAN
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Tanggal : $TGL \n" >> p${LINK}.txt
+		echo -e "Tanggal : $TGL" >> p${LINK}.txt
 
 		##PARSE MATAKULIAH PENGUMUMAN
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Matkul  : $MATKUL\n" >> p${LINK}.txt
+		echo -e "Matkul  : $MATKUL" >> p${LINK}.txt
 
 		##PARSE NAMA DOSEN
 		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
+		echo -e "Dosen   : $DOSEN\n" >> p${LINK}.txt
 
 		##PARSE ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
@@ -275,7 +275,7 @@ function tugas-parser {
 		
 		##parse judul tugas
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Judul   : $JUDUL \n" >> t${LINK}.txt
+		echo -e "Judul    : $JUDUL" >> t${LINK}.txt
 		
 		##parse tanggal tugas
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -287,7 +287,7 @@ function tugas-parser {
 		
 		##parse group tugas
 		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Group   : $GROUP" >> t${LINK}.txt
+		echo -e "Group    : $GROUP" >> t${LINK}.txt
 		
 		##parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
