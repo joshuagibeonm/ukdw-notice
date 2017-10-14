@@ -237,7 +237,8 @@ function tugas-parser {
 		
 		#parse tanggal
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1)
-		echo -e "Tanggal:$TGL" >> t${LINK}.txt
+		echo -e "$TGL" > tamp.txt
+		echo -e "Tanggal: `sed '2q;d' tamp.txt`" >> t${LINK}.txt
 		
 		#parse matkul
 		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1)
@@ -249,8 +250,8 @@ function tugas-parser {
 		
 		#parse judul
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
-		echo -e "Judul  :$JUDUL \n" >> t${LINK}.txt
-		
+		echo -e "$JUDUL" > tamp2.txt
+		echo -e "Judul  : `sed '2q;d' tamp2.txt` \n" >> t${LINK}.txt
 		
 		#parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
