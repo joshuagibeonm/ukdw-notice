@@ -43,11 +43,13 @@ function login-page {
 }
 
 function  pengumuman {
+	##display the contents of the "pengumuman" that we choose
 	MESSAGE=`cat p$1.txt`
 	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
 }
 
 function tugas {
+	##display the contents of the "tugas" that we choose
 	MESSAGE=`cat t$1.txt`
 	dialog --exit-label "Back" --msgbox "$MESSAGE" 25 60
 
@@ -209,19 +211,19 @@ function pengumuman-parser {
 
 		##PARSE JUDUL PENGUMUMAN
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Judul   : $JUDUL \n" >> p${LINK}.txt
+		echo -e "Judul   : $JUDUL \n" >> p${LINK}.txt
 
 		##PARSE TANGGAL PENGUMUMAN
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Tanggal : $TGL \n" >> p${LINK}.txt
+		echo -e "Tanggal : $TGL \n" >> p${LINK}.txt
 
 		##PARSE MATAKULIAH PENGUMUMAN
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Matkul  : $MATKUL\n" >> p${LINK}.txt
+		echo -e "Matkul  : $MATKUL\n" >> p${LINK}.txt
 
-		#PARSE NAMA DOSEN
+		##PARSE NAMA DOSEN
 		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		printf "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
+		echo -e "Dosen   : $DOSEN \n\n" >> p${LINK}.txt
 
 		##PARSE ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
@@ -243,7 +245,10 @@ function pengumuman-parser {
 			echo $ISI >> p${LINK}.txt
 			i=$(( i + 1 ))
 		done
+		
+		##encode parse HTML "pengumuman"
 		sed -i -e 's/&amp;/\&/g; s/&lt;/\</g; s/&gt;/\>/g; s/&quot;/\"/g; s/#&#39;/\'"'"'/g; s/&ldquo;/\"/g; s/&rdquo;/\"/g;' p${LINK}.txt
+		
 		rm pengumuman${LINK}.txt
 		((INDEX++))
 	done
@@ -268,23 +273,23 @@ function tugas-parser {
     	--compressed -o tugas${LINK}.txt
 		FILE="tugas${LINK}.txt"
 		
-		#parse tanggal
-		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Tanggal: $TGL" >> t${LINK}.txt
-		
-		#parse matkul
-		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Matkul:$MATKUL" >> t${LINK}.txt
-		
-		#parse group
-		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Group: $GROUP" >> t${LINK}.txt
-		
-		#parse judul
+		##parse judul tugas
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 		echo -e "Judul: $JUDUL \n" >> t${LINK}.txt
 		
-		#parse isi tugas
+		##parse tanggal tugas
+		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+		echo -e "Tanggal: $TGL" >> t${LINK}.txt
+		
+		##parse matkul tugas
+		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+		echo -e "Matkul:$MATKUL" >> t${LINK}.txt
+		
+		##parse group tugas
+		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+		echo -e "Group: $GROUP" >> t${LINK}.txt
+		
+		##parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
 		i=2
 		while [ 1 ]
@@ -300,7 +305,7 @@ function tugas-parser {
 		
 		echo -e " \n " >> t${LINK}.txt
 		
-		#parse ketentuan tugas
+		##parse ketentuan tugas
 		K1=$(ex +232p -scq $FILE | cut -d'<' -f1)
 		K2=$(ex +233p -scq $FILE | cut -d'<' -f1)
 		K3=$(sed '234q;d' $FILE)
@@ -314,7 +319,9 @@ function tugas-parser {
 		echo $K4 >> t${LINK}.txt
 		echo $K5 >> t${LINK}.txt
 		
+		##encode parse HTML "tugas"
 		sed -i -e 's/&amp;/\&/g; s/&lt;/\</g; s/&gt;/\>/g; s/&quot;/\"/g; s/#&#39;/\'"'"'/g; s/&ldquo;/\"/g; s/&rdquo;/\"/g;' t${LINK}.txt
+		
 		rm tugas${LINK}.txt
 		((INDEX++))
 	done
