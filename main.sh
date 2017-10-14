@@ -208,19 +208,19 @@ function pengumuman-parser {
 		FILE="pengumuman${LINK}.txt"
 
 		##PARSE JUDUL PENGUMUMAN
-		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
+		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 		printf "Judul  : $JUDUL \n" >> p${LINK}.txt
 
 		##PARSE TANGGAL PENGUMUMAN
-		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
+		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 		printf "Tanggal: $TGL \n" >> p${LINK}.txt
 
 		##PARSE MATAKULIAH PENGUMUMAN
-		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5)
+		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 		printf "Matkul : $MATKUL\n" >> p${LINK}.txt
 
 		#PARSE NAMA DOSEN
-		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
+		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 		printf "Dosen  : $DOSEN \n\n" >> p${LINK}.txt
 
 		##PARSE ISI PENGUMUMAN ($LF= last field)
