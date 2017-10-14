@@ -275,19 +275,19 @@ function tugas-parser {
 		
 		##parse judul tugas
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Judul: $JUDUL \n" >> t${LINK}.txt
+		echo -e "Judul   : $JUDUL \n" >> t${LINK}.txt
 		
 		##parse tanggal tugas
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f6 | cut -d'<' -f1 | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Tanggal: $TGL" >> t${LINK}.txt
+		echo -e "Tanggal : $TGL" >> t${LINK}.txt
 		
 		##parse matkul tugas
 		MATKUL=$(sed '217q;d' $FILE | cut -d']' -f2 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Matkul:$MATKUL" >> t${LINK}.txt
+		echo -e "Matkul  : $MATKUL" >> t${LINK}.txt
 		
 		##parse group tugas
 		GROUP=$(sed '227q;d' $FILE | cut -d'>' -f2 | cut -d'&' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Group: $GROUP" >> t${LINK}.txt
+		echo -e "Group   : $GROUP" >> t${LINK}.txt
 		
 		##parse isi tugas
 		LF=$(ex +231p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
