@@ -64,8 +64,8 @@ function show-tugas {
 	while [ $INDEX -le $LIMIT ]
 	do
 		CODE=`sed "${INDEX}q;d" tangka.txt`
-		JUDUL=`sed '4q;d' t$CODE.txt | cut -d':' -f2`
-		MATKUL=`sed '2q;d' t$CODE.txt | cut -d':' -f2`
+		JUDUL=`sed '1q;d' t$CODE.txt | cut -d':' -f2`
+		MATKUL=`sed '3q;d' t$CODE.txt | cut -d':' -f2`
 		LIST+=("$CODE" "$MATKUL: $JUDUL")
 		((INDEX++))
 	done
@@ -211,7 +211,7 @@ function pengumuman-parser {
 
 		##PARSE JUDUL PENGUMUMAN
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Judul   : $JUDUL" >> p${LINK}.txt
+		echo -e "Judul    : $JUDUL" >> p${LINK}.txt
 
 		##PARSE TANGGAL PENGUMUMAN
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -223,7 +223,7 @@ function pengumuman-parser {
 
 		##PARSE NAMA DOSEN
 		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-		echo -e "Dosen   : $DOSEN\n" >> p${LINK}.txt
+		echo -e "Dosen    : $DOSEN\n" >> p${LINK}.txt
 
 		##PARSE ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
