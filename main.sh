@@ -207,35 +207,35 @@ function pengumuman-parser {
 
 		FILE="pengumuman${LINK}.txt"
 
-		#parsing judul
+		##PARSE JUDUL PENGUMUMAN
 		JUDUL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f3 | cut -d'<' -f1)
 		printf "Judul  : $JUDUL \n" >> p${LINK}.txt
 
-		#parsing tanggal
+		##PARSE TANGGAL PENGUMUMAN
 		TGL=$(grep '<tr class="thread">' $FILE | cut -d'>' -f5 | cut -d'<' -f1)
 		printf "Tanggal: $TGL \n" >> p${LINK}.txt
 
-		#parsing matkul
+		##PARSE MATAKULIAH PENGUMUMAN
 		MATKUL=$(grep 'MATAKULIAH' $FILE | cut -d'>' -f3 | cut -d' ' -f2-5)
 		printf "Matkul : $MATKUL\n" >> p${LINK}.txt
 
-		#parsing dosen
+		#PARSE NAMA DOSEN
 		DOSEN=$(sed '132q;d' $FILE | cut -d' ' -f2-20 | cut -d'<' -f1)
 		printf "Dosen  : $DOSEN \n\n" >> p${LINK}.txt
 
-		#PARSING ISI PENGUMUMAN ($LF= last field)
+		##PARSE ISI PENGUMUMAN ($LF= last field)
 		LF=$(ex +130p -scq $FILE | rev | cut -d'^' -f2 | cut -d'>' -f3 | rev)
 		i=1
 		while [ 1 ]
 		do
 			ISI=$(ex +130p -scq $FILE | cut -d'>' --fields=$i | cut -d'^' -f1)
-			#CEK JIKA ADA HYPERLINK
+			##CEK JIKA ADA HYPERLINK
    			if [[ $ISI == *"<a href="* ]]; then
         			ISI=$(echo $ISI | cut -d'<' -f1)
     			elif [[ $ISI == *"</a"* ]]; then
         			ISI=$(echo $ISI | cut -d'<' -f1)
     			fi
-
+			##CEK JIKA ISI MERUPAKAN YANG TERKAHIR MAKA KELUAR DARI INFINITE LOOP
 			if [ "$ISI" = "$LF" ]; then
 				echo $ISI | cut -d'<' -f1 >> p${LINK}.txt
 				break
