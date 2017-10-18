@@ -56,7 +56,7 @@ function tugas {
 }
 
 function show-tugas {
-	##Display all "Tugas"
+	##display all "Tugas"
 	LIMIT=`wc -l < tangka.txt`
 	INDEX=1
 	LIST=()
@@ -89,7 +89,7 @@ function show-tugas {
 }
 
 function show-pengumuman {
-	##Display all "Pengumuman"
+	##display all "Pengumuman"
 	LIMIT=`wc -l < pangka.txt`
 	INDEX=1
 	LIST=()
@@ -122,7 +122,7 @@ function show-pengumuman {
 }
 
 function main-menu {
-	##Display a menu dialog box which consists of all available "pengumuman" and "tugas" in an infinite loop until exit
+	##display a menu dialog box which consists of all available "pengumuman" and "tugas" in an infinite loop until exit
 	while true
 	do
 		pilihan=$(dialog --title "Menu Utama" --no-cancel --no-ok \
@@ -190,17 +190,19 @@ function update {
 }
 
 function pengumuman-parser {
+	##mengambil kode pengumuman
 	grep -Eo '(http|https)://ukdw.ac.id/e-class/pengumuman/baca/[^"]+' link.txt > link_pengumuman.txt
-
+	
+	##menghitung banyak pengumuman
 	COUNT=`wc -l < link_pengumuman.txt`
 	INDEX=1
-
 
 	while [ $INDEX -le $COUNT ]
 	do
     	LINK=`sed -n "${INDEX}p" link_pengumuman.txt | grep -Eo 'baca/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:] | tee -a pangka.txt`
 		echo >> pangka.txt
-
+	
+	##mengambil page pengumuman
     	curl -s "http://ukdw.ac.id/e-class/id/pengumuman/baca/${LINK}" \
     	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
     	-H 'Connection: keep-alive' \
@@ -259,8 +261,10 @@ function pengumuman-parser {
 }
 
 function tugas-parser {
+	##mengambil kode tugas
 	grep -Eo '(http|https)://ukdw.ac.id/e-class/kelas/detail_tugas/[^"]+' link.txt > link_tugas.txt
-
+	
+	#menghitung berapa banyak tugas
 	COUNT=`wc -l < link_tugas.txt`
 	INDEX=1
 
@@ -270,6 +274,7 @@ function tugas-parser {
     	LINK=`sed -n "${INDEX}p" link_tugas.txt | grep -Eo 'detail_tugas/[^\n]+' | grep -Eo '[[:digit:]]' | tr -d [:space:] | tee -a tangka.txt`
 		echo >> tangka.txt
 
+	##mengambil page tugas
     	curl -s "http://ukdw.ac.id/e-class/id/kelas/detail_tugas/${LINK}" \
     	-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36' \
     	-H 'Connection: keep-alive' \
@@ -342,13 +347,3 @@ rm link.txt
 rm cookies.txt
 rm link_pengumuman.txt
 rm link_tugas.txt
-#login-page
-#
-#CODE=`sed '4!d' pangka.txt`
-#JUDUL=`sed '1!d' p$CODE.txt | cut -d':' -f2`
-#TANGGAL=`sed '2!d' p$CODE.txt | cut -d':' -f2`
-#MATKUL=`sed '3!d' p$CODE.txt | cut -d':' -f2`
-#DOSEN=`sed '4!d' p$CODE.txt | cut -d':' -f2`
-#LINES=`wc -l < p$CODE.txt`
-#ISI=`sed -n "5,${LINES}p" p$CODE.txt`
-#
